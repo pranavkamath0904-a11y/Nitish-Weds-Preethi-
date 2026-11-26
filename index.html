@@ -594,12 +594,12 @@
       </div>
     </section>
 
-    <!-- PERSONALIZE / EXPORT HELPER CARD -->
-    <section class="royal-card">
+    <!-- PERSONALIZE / EXPORT HELPER CARD (Automatically removed in exported file) -->
+    <section id="personalize-card" class="royal-card">
       <div class="section-kicker">Keepsake &amp; Music</div>
       <h2 class="section-title">Personalize Your Invitation</h2>
       <p class="body-text" style="font-size: 1.05rem; color: var(--muted);">
-        Add your couple photo or wedding MP3 track to preview it right on your phone, or export a self-contained copy with your photo and music baked in.
+        Add your couple photo or wedding MP3 track to preview it right on your phone, then save the final invitation without this box.
       </p>
 
       <div class="studio-controls">
@@ -726,11 +726,28 @@
       if (exportBtn) {
         exportBtn.addEventListener('click', function () {
           var clone = document.documentElement.cloneNode(true);
+
+          // Reset splash cover so guests see the cover first
           var cloneCover = clone.querySelector('#cover-screen');
           if (cloneCover) {
             cloneCover.classList.remove('is-open');
             cloneCover.style.display = '';
           }
+
+          // Remove the Personalize card completely from the exported invitation
+          var clonePersonalize = clone.querySelector('#personalize-card');
+          if (clonePersonalize) {
+            clonePersonalize.remove();
+          }
+
+          // Reset floating music button to hidden until guest opens the invitation
+          var cloneFab = clone.querySelector('#audio-fab');
+          if (cloneFab) {
+            cloneFab.classList.remove('visible');
+            cloneFab.textContent = '♪ Pause Music';
+          }
+
+          // Bake in chosen photo and MP3
           if (embeddedPhotoDataUrl) {
             var cloneFrame = clone.querySelector('#photo-frame');
             var cloneImg = clone.querySelector('#photo-preview');
@@ -745,6 +762,7 @@
               cloneAudio.setAttribute('src', embeddedAudioDataUrl);
             }
           }
+
           var fullHtml = '<!DOCTYPE html>\n' + clone.outerHTML;
           var blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
           var link = document.createElement('a');
